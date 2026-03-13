@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>KK FUNDA SPANDANAHome Page</title>
+<title>KK FUNDA Home Page</title>
 <link href="images/kkfunda.jpg" rel="icon">
 <!-- Bootstrap CDN -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -46,7 +46,7 @@
 <body>
 
 <header>
-     <h1> WELCOME TO KK FUNDA DEVOPS NEW BATCH WILL START ON APRIL 19TH 6:45 AM IST, DEMO AT 10 : 30 AM IST JST</h1> 
+     <h1> WELCOME TO KK FUNDA DEVOPS NEW BATCH WILL START ON APRIL 19TH 6:45 AM IST, DEMO AT 10 : 30 AM IST JST   spandana</h1> 
     <h3>Training | Development | Consulting</h3>
 </header>
 
