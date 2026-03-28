@@ -1,66 +1,55 @@
+pipeline {
+    agent any
 
-//uat jenkins pipeline
-pipeline
-{
-	
-   agent any
-   tools
-   {
-      maven "maven-3.9.6"
-   }
-   stages
-   {
-           stage('git checkout')
-           {
-              steps
-              {
-                 
-                 git branch: 'uat', url: 'https://github.com/kkdevopsb7/maven-webapplication-project-kkfunda.git'
-              }
-           }
-           stage('compile')
-           {
-              steps
-              {
-                 sh "mvn compile"
-              }
-           }
-           stage('Build')
-           {
-             steps
-             {
-               sh "mvn clean package"
-             }
-           }
-         stage('SQ REPORT')
-           {
-             steps
-             {
+    tools {
+        maven "maven-3.9.14"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'dev', url: 'https://github.com/spandana-11/maven-webapplication-project-kkfunda.git'
+            }
+        }
+
+        stage('Maven Build') {
+            steps {
+                sh "mvn clean package"
+            }
+        }
+
+        stage('Sonar Report') {
+            steps {
                 sh "mvn sonar:sonar"
-             }
-           }   
-           stage('Deploy to nexus')
-           {
-              steps
-              {
-                sh "mvn clean deploy"
-              }
-           }
-           stage('Deploy to tomcat')
-           {
-              steps
-              {
-                 sh """
+            }
+        }
+    }
 
-      curl -u kk:password \
---upload-file /var/lib/jenkins/workspace/jio-Declarative-PL-dev/target/maven-web-application.war \
-"http://13.232.234.199:8080/manager/text/deploy?path=/maven-web-application&update=true"
-          
-        """
-              }
-           }
-           
+    post {
 
-   }  //stages ending
+        started {
+            slackSend(
+                channel: '#practice-devops',
+                color: '#FFFF00',
+                message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+            )
+        }
 
-} // pipeline closed
+        success {
+            slackSend(
+                channel: '#practice-devops',
+                color: '#00FF00',
+                message: "SUCCESS: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+            )
+        }
+
+        failure {
+            slackSend(
+                channel: '#practice-devops',
+                color: '#FF0000',
+                message: "FAILURE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+            )
+        }
+    }
+}
