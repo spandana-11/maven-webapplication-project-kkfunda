@@ -1,77 +1,63 @@
-
-//dev jenkins pipe////line
-pipeline
+node 
 {
-    
-   agent any
-   tools
-   {
-      maven "maven-3.9.7"
-   }
-   stages
-   {
-           stage('git checkout')
-           {
-              steps
-              {
-                 
-                 git branch: 'dev', url: 'https://github.com/kkdevopsb7/maven-webapplication-project-kkfunda.git'
-              }
-           }
-           stage('compile')
-           {
-              steps
-              {
-                 sh "mvn compile"
-              }
-           }
-           stage('Build')
-           {
-             steps
-             {
-               sh "mvn clean package"
-             }
-           }
-         stage('SQ REPORT')
-           {
-             steps
-             {
-                sh "mvn sonar:sonar"
-             }
-           }   
-           stage('Deploy to nexus')
-           {
-              steps
-              {
-                sh "mvn clean deploy"
-              }
-           }
-           stage('Deploy to tomcat')
-           {
-              steps
-              {
-                 sh """
+    //   /var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/maven-3.9.6
+   def mavenHome=tool name: "maven-3.9.14"
+echo "git branch Name: ${env.BRANCH_NAME}"
+echo "build number: ${env.BUILD_NUMBER}"
 
-      curl -u kk:password \
---upload-file /var/lib/jenkins/workspace/jio-Declarative-PL-dev/target/maven-web-application.war \
-"http://13.232.234.199:8080/manager/text/deploy?path=/maven-web-application&update=true"
-          
-        """
-              }
-           }
-           stage('airtel-qa')
-           {
-              steps
-              {
-                 build job: 'airtel-qa'  //This down stream job
-              }
-           }
+   try
+   {  
 
-   }  //stages ending
+     stage('Checkout Code') {
+            git branch: 'dev', url: 'https://github.com/spandana-11/maven-webapplication-project-kkfunda.git'
+        }
 
-   } //pipeline ending
+        stage('Maven Build') {
+            sh "${mavenHome}/bin/mvn clean package"
+        }
+
+        stage('Sonar Report') {
+            sh "${mavenHome}/bin/mvn sonar:sonar"
+        }
 
 
+   }  //try block end
+   catch (e) {
+   
+       currentBuild.result = "FAILED"
+
+  } finally {
+    // Success or failure, always send notifications
+    notifyBuild(currentBuild.result)       //function calling
+  }
+
+  
+}  //node ending
 
 
+def notifyBuild(String buildStatus = 'STARTED') {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESS'
 
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+  def summary = "${subject} (${env.BUILD_URL})"
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESS') {
+    color = 'GREEN'
+    colorCode = '#278EF5'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+
+  // Send notifications
+  slackSend (color: colorCode, message: summary, channel: '#practice-devops')
+  
+}
