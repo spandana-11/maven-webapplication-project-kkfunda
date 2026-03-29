@@ -9,7 +9,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'dev', url: 'https://github.com/spandana-11/maven-webapplication-project-kkfunda.git'
+                git branch: 'uat', url: 'https://github.com/spandana-11/maven-webapplication-project-kkfunda.git'
             }
         }
 
