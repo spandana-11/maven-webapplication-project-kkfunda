@@ -7,6 +7,16 @@ pipeline {
 
     stages {
 
+        stage('Start Notification') {
+            steps {
+                slackSend(
+                    channel: '#practice-devops',
+                    color: '#FFFF00',
+                    message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                )
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git branch: 'uat', url: 'https://github.com/spandana-11/maven-webapplication-project-kkfunda.git'
@@ -27,14 +37,6 @@ pipeline {
     }
 
     post {
-
-        started {
-            slackSend(
-                channel: '#practice-devops',
-                color: '#FFFF00',
-                message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
-            )
-        }
 
         success {
             slackSend(
